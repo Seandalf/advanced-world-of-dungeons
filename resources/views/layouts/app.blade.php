@@ -8,7 +8,7 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Lobster+Two&display=swap">
 
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">

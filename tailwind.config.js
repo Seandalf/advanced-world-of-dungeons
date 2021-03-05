@@ -11,11 +11,16 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: ['Inter var', ...defaultTheme.fontFamily.sans],
-                fantasy: ['Akaya Kanadaka']
+                fantasy: ['Lobster Two'],
+                handwriting: ['Indie Flower']
             },
             colors: {
                 'taupe': '#cc2b5e',
                 'violet': '#753a88'
+            },
+            screens: {
+                'xs': '500px',
+                'mdl': '896px'
             }
         },
     },

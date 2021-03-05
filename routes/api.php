@@ -20,3 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/characters/show/{id}', [CharacterApiController::class, 'show']);
+Route::patch('/characters/update', [CharacterApiController::class, 'update']);

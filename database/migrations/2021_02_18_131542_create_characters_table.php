@@ -28,9 +28,9 @@ class CreateCharactersTable extends Migration
             $table->tinyInteger('hp')->default(0);
             $table->tinyInteger('hit_dice')->default(0);
             $table->tinyInteger('power')->default(0);
-            $table->tinyInteger('xp')->default(0);
+            $table->integer('xp')->default(0);
             $table->tinyInteger('level')->default(1);
-            $table->tinyInteger('coin')->default(0);
+            $table->integer('coin')->default(0);
             $table->unsignedBigInteger('status_id')->nullable()->default(null);
             $table->text('notes')->nullable();
             $table->timestamps();
