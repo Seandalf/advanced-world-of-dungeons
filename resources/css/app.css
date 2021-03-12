@@ -9,3 +9,8 @@
     background-position: center;
     background-size: cover;
 }
+
+.sweet-modal.is-alert .sweet-content {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+}

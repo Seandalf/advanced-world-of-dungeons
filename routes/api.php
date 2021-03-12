@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\API\CharacterApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\SkillApiController;
+use App\Http\Controllers\API\ArmourApiController;
+use App\Http\Controllers\API\AbilityApiController;
+use App\Http\Controllers\API\CharacterApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +24,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/characters/show/{id}', [CharacterApiController::class, 'show']);
 Route::patch('/characters/update', [CharacterApiController::class, 'update']);
+
+Route::get('/skills/index', [SkillApiController::class, 'index']);
+Route::get('/abilities/index', [AbilityApiController::class, 'index']);
+Route::get('/armours/index', [ArmourApiController::class, 'index']);
+
+Route::post('/character/level', [CharacterApiController::class, 'levelUp']);

@@ -9,7 +9,9 @@ require('./bootstrap');
 window.Vue = require('vue').default;
 
 import SweetModal from 'sweet-modal-vue/src/plugin.js';
+import VueNotification from '@mathieustan/vue-notification';
 Vue.use(SweetModal);
+Vue.use(VueNotification);
 
 /**
  * The following block of code may be used to automatically register your

@@ -18,9 +18,13 @@
         <div class="flex-grow text-right flex justify-end items-center">
           <div class="mr-2 flex justify-end items-center">
             <h3 class="text-2xl font-fantasy block text-white inline">XP</h3>
-            <input v-model="character.xp" class="text-xl ml-2 w-16 tracking-tighter font-semibold bg-transparent outline-none focus:outline-none text-white opacity-50 focus:opacity-100"></input>
+            <input v-model="experience" @blur="updateXp" class="text-xl ml-2 w-16 tracking-tighter font-semibold bg-transparent outline-none focus:outline-none text-white opacity-50 focus:opacity-100"></input>
           </div>
-          <button class="rounded border border-white border-opacity-10 px-3 py-2 font-fantasy text-lg text-white hover:text-taupe hover:bg-white focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
+          <button 
+            v-if="character.xp >= (character.level * 1000)"
+            @click="startLevelUp"
+            class="rounded border border-white border-opacity-10 px-3 py-2 font-fantasy text-lg text-white hover:text-taupe hover:bg-white focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all"
+          >
             Level Up!
           </button>
         </div>
@@ -47,8 +51,8 @@
         </div>
         <!-- Equipment and Items list -->
         <div class="col-span-1">
-          <button class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
-            Item list
+          <button @click="startShopping" class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
+            Go Shopping
           </button>
         </div>
         <!-- Random Generators -->
@@ -68,6 +72,21 @@
       <div class="grid grid-cols-1 gap-y-3 md:gap-x-4 md:grid-cols-2 mdl:grid-cols-3 items-start">
         <div class="col-span-2 mdl:col-span-1 grid grid-cols-1 xs:grid-cols-2 mdl:grid-cols-1 gap-3 items-start">
           <health-tracker class="col-span-1 xs:col-span-2 mdl:col-span-1" :current-hp="character.current_hp" :max-hp="character.max_hp" :armour="armourStrength" v-on:changeHp="updateHp"></health-tracker>
+          <div class="flex flex-grow-0 shadow">
+            <div class="flex-grow rounded bg-white p-3 font-semibold text-gray-800 bg-opacity-95 flex items-center">
+              <div class="flex-grow-0 w-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div class="ml-2 flex-grow-0">
+                Coin
+              </div>
+              <div class="ml-2 flex-grow-0">
+                <input type="text" class="w-full bg-transparent border-0 p-0 text-xl font-semibold text-violet text-right outline-none ring-0 focus:border-0 focus:ring-0 focus:outline-none" v-model="coin" @blur="updateCoin" />
+              </div>
+            </div>
+          </div>
           <power :character-power="character.power" v-on:changePower="updatePower"></power>
           <stat name="Strength" :stat="character.str"></stat>
           <stat name="Dexterity" :stat="character.dex"></stat>
@@ -78,7 +97,7 @@
         </div>
         <!-- Main Content -->
         <div class="col-span-2 items-start">
-          <div class="block mb-2">
+          <div class="block mb-4">
             <nav class="relative z-0 rounded-lg shadow flex">
               <button
                 :class="selectedTab === 'details' ? 'text-gray-900 rounded-l-lg group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center focus:z-10 outline-none focus:outline-none' : 'text-gray-700 hover:text-gray-800 rounded-l-lg group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-sm font-medium text-center hover:bg-opacity-100 bg-opacity-50 focus:z-10 transition-all outline-none focus:outline-none'"
@@ -237,7 +256,7 @@
               <div class="rounded-lg shadow overflow-hidden divide-y divide-gray-200">
                 <div class="bg-white px-2 py-3 sm:px-3 flex">
                   <div class="text-xs font-semibold uppercase tracking-widest text-gray-600">
-                    Weapons
+                    Weapons <span v-if="character.level > 4" class="font-normal pl-1">+{{ character.level === 10 ? '2' : '1' }}d6 from level</span>
                   </div>
                 </div>
                 <div class="bg-white bg-opacity-95 px-2 sm:px-3 flex">
@@ -322,8 +341,8 @@
                     </div>
                     <div v-if="item.pivot.uses !== null" class="mt-1 flex items-center block">
                       <button
-                        :disabled="!item.pivot.carried"
-                        class="w-full text-xs px-2 bg-transparent border rounded border-violet text-violet hover:bg-violet hover:text-white"
+                        :disabled="!item.pivot.carried || item.pivot.uses === 0"
+                        class="w-full text-xs px-2 bg-transparent border rounded border-violet border-opacity-30 text-violet hover:bg-violet hover:text-white"
                         @click="item.pivot.uses = item.pivot.uses - 1"
                       >Use</button>
                     </div>
@@ -341,17 +360,53 @@
             <div class="bg-white bg-opacity-95 px-2 py-2 sm:p-3">
               <textarea v-model="character.notes" class="text-lg border-0 w-full font-handwriting leading-loose bg-transparent outline-none focus:outline-none focus:outline-none focus:ring-0 focus:shadow-none"></textarea>
             </div>
-            <button @click="$refs.testModel.open()">Test</button>
           </div>
         </div>
       </div>
+      <sweet-modal ref="levelUpModal" hide-close-button blocking pulse-on-block>
+        <level-up
+          ref="levelUpComp"
+          v-if="levellingUp"
+          :character="character"
+        ></level-up>
+        <button
+          slot="button"
+          @click="$refs.levelUpModal.close()"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Cancel
+        </button>
+        <button
+          slot="button"
+          @click="$refs.levelUpComp.submit()"
+          class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Confirm
+        </button>
+      </sweet-modal>
+      <sweet-modal ref="shoppingModal" hide-close-button blocking pulse-on-block>
+        <shopping
+          ref="shoppingComp"
+          v-if="shopping"
+          :character="character.id"
+          :coin="coin"
+        ></shopping>
+        <button
+          slot="button"
+          @click="$refs.shoppingModal.close()"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Cancel
+        </button>
+        <button
+          slot="button"
+          @click="$refs.shoppingComp.submit()"
+          class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Purchase
+        </button>
+      </sweet-modal>
     </template>
-    <sweet-modal title="Oh noes…" ref="testModel" hide-close-button blocking pulse-on-block>
-      This is an error…
-
-      <button slot="button">That's fine!</button>
-      <button slot="button">That's not fine!</button>
-    </sweet-modal>
   </div>
 </template>
 
@@ -360,43 +415,51 @@ import Spinner from "vue-simple-spinner";
 import Stat from "./StatComponent";
 import HealthTracker from "./HealthTrackerComponent";
 import Power from "./PowerComponent";
+import LevelUp from "./LevelUpComponent";
+import Shopping from "./ShoppingComponent";
 
 export default {
   components: {
     Spinner,
     Stat,
     HealthTracker,
-    Power
+    Power,
+    LevelUp,
+    Shopping,
   },
   props: {
     id: {
       type: Number,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
       isLoading: true,
       character: null,
-      selectedTab: 'items',
+      selectedTab: "items",
       random: Math.floor(100000 + Math.random() * 900000),
       keyChange: 1,
-      stopCheck: false
+      stopCheck: false,
+      coin: 0,
+      levellingUp: false,
+      experience: 0,
+      shopping: false,
     };
   },
   computed: {
     armourStrength: function () {
       if (this.character !== null) {
         let total = 0;
-        this.character.armours.forEach(armour => {
+        this.character.armours.forEach((armour) => {
           if (armour.pivot.equipped) {
             total += armour.armour_value;
           }
-        })
+        });
         return total;
       }
       return 0;
-    }
+    },
   },
   watch: {
     character: {
@@ -405,13 +468,13 @@ export default {
           this.updateCharacter();
         }
       },
-      deep: true
+      deep: true,
     },
     keyChange: function (newVal, oldVal) {
       if (newVal !== oldVal) {
         this.stopCheck = false;
       }
-    }
+    },
   },
   mounted() {
     this.fetchCharacter();
@@ -421,14 +484,30 @@ export default {
       this.isLoading = true;
       axios
         .get("api/characters/show/" + this.id)
-        .then(res => {
+        .then((res) => {
           this.character = res.data.character;
+          this.coin = this.character.coin;
+          this.experience = this.character.xp;
           this.isLoading = false;
           this.keyChange++;
         })
-        .catch(e => {
-          console.log(e.data);
-          this.isLoading = false;
+        .catch((e) => {
+          let message;
+          if (e.response.data.reason != null) {
+            message = e.response.data.reason;
+          } else {
+            message = "Problem fetching your character";
+          }
+          this.$notify({
+            message: message,
+            type: "error",
+            top: false,
+            bottom: true,
+            left: false,
+            right: true,
+            showClose: true,
+            closeDelay: 0,
+          });
         });
     },
     changeTab(tab) {
@@ -443,21 +522,53 @@ export default {
     updateCharacter() {
       this.stopCheck = true;
       axios
-        .patch('api/characters/update', {
-          character: this.character
+        .patch("api/characters/update", {
+          character: this.character,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.success) {
             this.character = res.data.character;
+            this.coin = this.character.coin;
             this.keyChange++;
           } else {
-            throw new Error('fuck');
+            throw new Error("fuck");
           }
         })
-        .catch(e => {
-          console.log(e.data);
-        })
-    }
-  }
+        .catch((e) => {
+          let message;
+          if (e.response.data.reason != null) {
+            message = e.response.data.reason;
+          } else {
+            message = "Problem saving your character";
+          }
+          this.$notify({
+            message: message,
+            type: "error",
+            top: false,
+            bottom: true,
+            left: false,
+            right: true,
+            showClose: true,
+            closeDelay: 0,
+          });
+        });
+    },
+    updateCoin() {
+      this.character.coin = this.coin;
+    },
+    updateXp() {
+      this.character.xp = this.experience;
+    },
+    startLevelUp() {
+      this.levellingUp = true;
+      this.stopCheck = true;
+      this.$refs.levelUpModal.open();
+    },
+    startShopping() {
+      this.shopping = true;
+      this.stopCheck = true;
+      this.$refs.shoppingModal.open();
+    },
+  },
 };
 </script>
