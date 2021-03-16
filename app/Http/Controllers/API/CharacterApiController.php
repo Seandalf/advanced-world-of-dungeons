@@ -7,6 +7,7 @@ use App\Models\Character;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Equipment;
 
 class CharacterApiController extends Controller
 {
@@ -14,6 +15,7 @@ class CharacterApiController extends Controller
     protected $skill_levels = [3, 6, 9];
     protected $attr_levels = [4, 7, 10];
     protected $ability_levels = [3, 6, 9];
+    protected $special_levels = [2, 4, 6, 8, 10];
 
     /**
      * Display a listing of the resource.
@@ -52,7 +54,9 @@ class CharacterApiController extends Controller
                 'abilities',
                 'equipment',
                 'weapons',
-                'armours'
+                'armours',
+                'spells',
+                'specials'
             )->first();
 
             return response()->json([
@@ -120,6 +124,10 @@ class CharacterApiController extends Controller
             unset($req['equipment']);
             unset($req['weapons']);
             unset($req['armours']);
+            unset($req['has_spells']);
+            unset($req['has_power']);
+            unset($req['spells']);
+            unset($req['specials']);
 
             $id = $req['id'];
             unset($req['id']);
@@ -132,7 +140,9 @@ class CharacterApiController extends Controller
                 'abilities',
                 'equipment',
                 'weapons',
-                'armours'
+                'armours',
+                'spells',
+                'specials'
             )->first();
 
             return response()->json([
@@ -205,11 +215,94 @@ class CharacterApiController extends Controller
                 $character->abilities()->attach($req['ability']);
             }
 
+            if (in_array($req['new_level'], $this->special_levels)) {
+                if ($character->has_spells) {
+                    $character->spells()->attach($req['special']);
+                } else {
+                    $character->specials()->attach($req['special']);
+                }
+            }
+
             return response()->json([
                 'success'   => true
             ]);
         } catch (Exception $e) {
             Log::error('Could not level up character', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'reason'  => $e->getMessage()
+            ])->setStatusCode(500);
+        }
+    }
+
+    public function goShopping(Request $request)
+    {
+        try {
+            $armour = $request->armour;
+            $items = $request->items;
+            $weapons = $request->weapons;
+            $character = Character::find($request->character);
+
+            foreach ($armour as $a) {
+                if($character->armours->contains($a)) {
+                    foreach($character->armours as $char_armour) {
+                        if ($char_armour['id'] === $a) {
+                            $armour_quantity = $char_armour['pivot']['quantity'];
+                        }
+                    }
+                    $character->armours()->updateExistingPivot($a, [
+                        'quantity' => $armour_quantity + 1
+                    ]);
+                } else {
+                    $character->armours()->attach($a, ['quantity' => 1, 'carried' => 1, 'equipped' => 0]);
+                }
+            }
+
+            foreach ($items as $item) {
+                $item_record = Equipment::find($item);
+                if($character->equipment->contains($item)) {
+                    foreach($character->equipment as $i) {
+                        if ($i['id'] === $item) {
+                            $item_quantity = $i['pivot']['quantity'];
+                            if ($item_record['uses'] !== null) {
+                                $item_uses = $i['pivot']['uses'];
+                            }
+                        }
+                    }
+                    $arr['quantity'] = $item_quantity + 1;
+                    if ($item_record['uses'] !== null) {
+                        $arr['uses'] = $item_uses + $item_record['uses'];
+                    }
+                    $character->equipment()->updateExistingPivot($item, $arr);
+                } else {
+                    $arr = ['quantity' => 1, 'carried' => 1, 'equipped' => 0];
+                    if ($item_record['uses'] !== null) {
+                        $arr['uses'] = $item_record['uses'];
+                    }
+                    $character->equipment()->attach($item, $arr);
+                }
+            }
+
+            foreach ($weapons as $weapon) {
+                if($character->weapons->contains($weapon)) {
+                    foreach($character->weapons as $char_weapon) {
+                        if ($char_weapon['id'] === $a) {
+                            $weapon_quantity = $char_weapon['pivot']['quantity'];
+                        }
+                    }
+                    $character->weapons()->updateExistingPivot($a, [
+                        'quantity' => $weapon_quantity + 1
+                    ]);
+                } else {
+                    $character->weapons()->attach($a, ['quantity' => 1, 'carried' => 1, 'equipped' => 0]);
+                }
+            }
+
+            return response()->json([
+                'success' => true
+            ])->setStatusCode(200);
+        } catch (Exception $e) {
+            Log::error('Could not go shopping', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'reason'  => $e->getMessage()

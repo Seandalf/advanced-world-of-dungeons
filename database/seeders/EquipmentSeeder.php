@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Equipment;
 use Illuminate\Database\Seeder;
 
 class EquipmentSeeder extends Seeder
@@ -13,6 +14,13 @@ class EquipmentSeeder extends Seeder
      */
     public function run()
     {
-        //
+        Equipment::insert([
+            [
+                'name'        => '',
+                'description' => '',
+                'cost'        => '',
+                'uses'        => ''
+            ]
+        ]);
     }
 }

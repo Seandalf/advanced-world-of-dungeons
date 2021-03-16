@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\CharacterController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CharacterController;
+use App\Http\Controllers\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/character-sheet', 301);
 
 Route::get('/character-sheet', [CharacterController::class, 'index'])->middleware(['auth'])->name('character');
+Route::post('/character/create', [CharacterController::class, 'create'])->middleware(['auth'])->name('character.create');
 
-Route::get('/cowboy', function () {
-    return Illuminate\Support\Facades\Hash::make('test1234');
-});
+Route::get('/reset', [ResetPasswordController::class, 'index'])->middleware(['auth'])->name('pass.reset');
+Route::post('/reset', [ResetPasswordController::class, 'resetPassword'])->middleware(['auth'])->name('pass.reset');
 
 require __DIR__ . '/auth.php';

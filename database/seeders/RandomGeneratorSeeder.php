@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Armour;
+use App\Models\RandomGenerator;
 use Illuminate\Database\Seeder;
 
-class ArmourSeeder extends Seeder
+class RandomGeneratorSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,12 +14,10 @@ class ArmourSeeder extends Seeder
      */
     public function run()
     {
-        Armour::insert([
+        RandomGenerator::insert([
             [
-                'name' => '',
-                'effect' => '',
-                'armour_value' => '',
-                'cost' => ''
+                'type'  => '',
+                'value' => ''
             ]
         ]);
     }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
+use App\Models\Equipment;
 use Exception;
-use App\Models\Ability;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
 
-class AbilityApiController extends Controller
+class EquipmentApiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,10 +20,10 @@ class AbilityApiController extends Controller
         try {
             return response()->json([
                 'success' => true,
-                'abilities'  => Ability::whereNull('class_id')->toArray()
+                'items' => Equipment::all()
             ])->setStatusCode(200);
         } catch (Exception $e) {
-            Log::error('Could not fetch abiities', ['error' => $e->getMessage()]);
+            Log::error('Could not fetch equipment', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'reason'  => $e->getMessage()

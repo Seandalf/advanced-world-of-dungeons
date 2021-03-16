@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Weapon;
 use Illuminate\Database\Seeder;
 
 class WeaponSeeder extends Seeder
@@ -13,6 +14,13 @@ class WeaponSeeder extends Seeder
      */
     public function run()
     {
-        //
+        Weapon::insert([
+            [
+                'name'        => '',
+                'description' => '',
+                'damage'      => '',
+                'cost'        => ''
+            ]
+        ]);
     }
 }

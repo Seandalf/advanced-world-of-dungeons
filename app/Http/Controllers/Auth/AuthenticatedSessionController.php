@@ -39,7 +39,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect(RouteServiceProvider::HOME);
+        if (Auth::user()->reset_password) {
+            return redirect('/reset');
+        } else {
+            return redirect(RouteServiceProvider::HOME);
+        }
     }
 
     /**

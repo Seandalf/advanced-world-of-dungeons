@@ -20,7 +20,7 @@
             <h3 class="text-2xl font-fantasy block text-white inline">XP</h3>
             <input v-model="experience" @blur="updateXp" class="text-xl ml-2 w-16 tracking-tighter font-semibold bg-transparent outline-none focus:outline-none text-white opacity-50 focus:opacity-100"></input>
           </div>
-          <button 
+          <button
             v-if="character.xp >= (character.level * 1000)"
             @click="startLevelUp"
             class="rounded border border-white border-opacity-10 px-3 py-2 font-fantasy text-lg text-white hover:text-taupe hover:bg-white focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all"
@@ -30,43 +30,34 @@
         </div>
       </div>
       <!-- Toolbox -->
-      <div class="grid grid-cols-1 mdl:grid-cols-6 xs:grid-cols-2 gap-4 my-4">
-        <!-- Calculate HP -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+        <!-- Lore Book -->
         <div class="col-span-1">
-          <button class="rounded-lg shadow block w-full border text-sm font-semibold border-white border-opacity-20 bg-white bg-opacity-10 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
-            Calculate HP
-          </button>
+          <a
+            href="https://docs.google.com/presentation/d/1pl3BKABSYq4TbFyqhS7XaJQBafGqQo-xv4hYMJ9-VYc/edit?fbclid=IwAR2uc62_8XUfuIz4XxRegszqzPPZGgxeJarzx9-oZ6Y4LYHsWhLFqqGGpas#slide=id.gc6f04e3da3_1_63"
+            target="_blank"
+            class="rounded-lg shadow block w-full border text-sm text-center font-semibold border-white border-opacity-20 bg-white bg-opacity-10 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
+            Lore Book
+          </a>
         </div>
-        <!-- Roll dice -->
-        <div class="col-span-1">
-          <button class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
-            Dice Roller
-          </button>
-        </div>
-        <!-- Basic Rules -->
+        <!-- World Wiki -->
         <div class="col-span-1">
           <button class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
-            Basic Rules
+            World Wiki
           </button>
         </div>
-        <!-- Equipment and Items list -->
+        <!-- Equipment and Items list
         <div class="col-span-1">
           <button @click="startShopping" class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
             Go Shopping
           </button>
         </div>
-        <!-- Random Generators -->
+        <!-- Random Generators
         <div class="col-span-1">
-          <button class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
+          <button @click="$refs.generatorModal.open()" class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
             Generators
           </button>
-        </div>
-        <!-- Character and Locations -->
-        <div class="col-span-1">
-          <button class="shadow text-sm font-semibold bg-white bg-opacity-10 rounded-lg block w-full border border-white border-opacity-20 tracking-tightest px-3 py-2 text-white hover:text-taupe hover:bg-opacity-100 focus:text-taupe focus:bg-white outline-none focus:outline-none transition-all">
-            World Details
-          </button>
-        </div>
+        </div> -->
       </div>
       <!-- Side Content -->
       <div class="grid grid-cols-1 gap-y-3 md:gap-x-4 md:grid-cols-2 mdl:grid-cols-3 items-start">
@@ -87,7 +78,7 @@
               </div>
             </div>
           </div>
-          <power :character-power="character.power" v-on:changePower="updatePower"></power>
+          <power v-if="character.has_power" :character-power="character.power" v-on:changePower="updatePower"></power>
           <stat name="Strength" :stat="character.str"></stat>
           <stat name="Dexterity" :stat="character.dex"></stat>
           <stat name="Constitution" :stat="character.con"></stat>
@@ -175,7 +166,7 @@
                     class="py-3 border-b border-gray-200 border-opacity-95"
                   >
                     <h4 class="text-sm text-violet font-semibold tracking-wide">{{ ability.name }}</h4>
-                    <p class="text-xs tracking-wide leading-loose text-gray-800">{{ ability.effect }}</p>
+                    <p class="text-xs tracking-wide leading-loose text-gray-800" v-html="ability.effect"></p>
                   </div>
                 </div>
               </div>
@@ -195,7 +186,34 @@
                     <h4 class="text-sm text-violet font-semibold tracking-wide">{{ skill.name }}</h4>
                     <p class="text-xs tracking-wide leading-loose text-gray-800">{{ skill.flavour_text }}</p>
                   </div>
+                  <div
+                    v-if="!character.has_spells"
+                    v-for="(special, index) in character.specials"
+                    :key="'special-' + index"
+                    class="py-3 border-b border-gray-200 border-opacity-95"
+                  >
+                    <h4 class="text-sm text-violet font-semibold tracking-wide">{{ special.name }}</h4>
+                    <p class="text-xs tracking-wide leading-loose text-gray-800">{{ special.effect }}</p>
+                  </div>
                 </div>
+                <!-- Spells -->
+                <template v-if="character.has_spells">
+                  <div class="mt-4 bg-white px-2 py-3 sm:px-3 flex rounded-t-lg">
+                    <div class="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                      Spells
+                    </div>
+                  </div>
+                  <div class="bg-white bg-opacity-95 px-2 sm:px-3 rounded-b-lg shadow">
+                    <div
+                      v-for="(spell, index) in character.spells"
+                      :key="'spell-' + index"
+                      class="py-3 border-b border-gray-200 border-opacity-95"
+                    >
+                      <h4 class="text-sm text-violet font-semibold tracking-wide">{{ spell.name }}</h4>
+                      <p class="text-xs tracking-wide leading-loose text-gray-800" v-html="spell.effect"></p>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
           </template>
@@ -342,7 +360,7 @@
                     <div v-if="item.pivot.uses !== null" class="mt-1 flex items-center block">
                       <button
                         :disabled="!item.pivot.carried || item.pivot.uses === 0"
-                        class="w-full text-xs px-2 bg-transparent border rounded border-violet border-opacity-30 text-violet hover:bg-violet hover:text-white"
+                        class="w-full text-xs px-2 bg-transparent border rounded border-violet border-opacity-30 text-violet hover:bg-violet hover:text-white disabled:pointer-events-none disabled:opacity-50"
                         @click="item.pivot.uses = item.pivot.uses - 1"
                       >Use</button>
                     </div>
@@ -401,9 +419,19 @@
         <button
           slot="button"
           @click="$refs.shoppingComp.submit()"
-          class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:pointer-events-none disabled:opacity-50"
         >
           Purchase
+        </button>
+      </sweet-modal>
+      <sweet-modal ref="generatorModal" hide-close-button blocking pulse-on-block>
+        <generator></generator>
+        <button
+          slot="button"
+          @click="$refs.generatorModal.close()"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Close
         </button>
       </sweet-modal>
     </template>
@@ -417,6 +445,7 @@ import HealthTracker from "./HealthTrackerComponent";
 import Power from "./PowerComponent";
 import LevelUp from "./LevelUpComponent";
 import Shopping from "./ShoppingComponent";
+import Generator from "./GeneratorComponent";
 
 export default {
   components: {
@@ -426,6 +455,7 @@ export default {
     Power,
     LevelUp,
     Shopping,
+    Generator
   },
   props: {
     id: {
@@ -437,7 +467,7 @@ export default {
     return {
       isLoading: true,
       character: null,
-      selectedTab: "items",
+      selectedTab: "details",
       random: Math.floor(100000 + Math.random() * 900000),
       keyChange: 1,
       stopCheck: false,

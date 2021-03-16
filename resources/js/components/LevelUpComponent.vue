@@ -94,6 +94,30 @@
           </select>
         </div>
         <div
+          v-if="specialLevels.includes(current.level + 1)"
+          class="col-span-1 py-3"
+        >
+          <p class="text-sm leading-loose text-left">
+            <span class="font-semibold">You gain a new {{ character.has_spells ? 'spell' : 'speciality skill' }}! </span>Choose a
+            new {{ character.has_spells ? 'spell' : 'speciality skill' }} from the list below and enjoy your new power.
+          </p>
+
+          <select
+            :disabled="specialsLoading"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            v-model="selectedSpecial"
+          >
+            <option disabled selected>-- Select {{ character.has_spells ? 'Spell' : 'Speciality Skill' }} --</option>
+            <option
+              v-for="(special, index) in specials"
+              :key="'level-specials-' + index"
+              :value="special.id"
+            >
+              {{ special.name }}
+            </option>
+          </select>
+        </div>
+        <div
           v-if="attrLevels.includes(current.level + 1)"
           class="col-span-1 py-3"
         >
@@ -138,16 +162,20 @@ export default {
       current: this.character,
       healthLevels: [2, 4, 6, 8, 10],
       skillLevels: [3, 6, 9],
+      specialLevels: [2,4,6,8,10],
       attrLevels: [4, 7, 10],
       abilityLevels: [3, 6, 9],
       damageLevels: [5, 10],
       skills: [],
       abilities: [],
+      specials: [],
       skillsLoading: false,
       abilitiesLoading: false,
+      specialsLoading: false,
       statIncrease: null,
       selectedSkill: null,
       selectedAbility: null,
+      selectedSpecial: null,
       hpIncrease: null,
       isLoading: false,
     };
@@ -158,6 +186,13 @@ export default {
     }
     if (this.abilityLevels.includes(this.current.level + 1)) {
       this.fetchAbilities();
+    }
+    if (this.specialLevels.includes(this.current.level + 1)) {
+      if (this.character.has_spells) {
+        this.fetchSpells();
+      } else {
+        this.fetchSpecials();
+      }
     }
   },
   methods: {
@@ -225,6 +260,70 @@ export default {
           this.abilitiesLoading = false;
         });
     },
+    fetchSpells() {
+      this.specialsLoading = true;
+      axios
+        .get("api/spells/index/" + this.character.id)
+        .then((res) => {
+          if (res.data.spells != null) {
+            this.specials = res.data.spells;
+            this.specialsLoading = false;
+          } else {
+            throw new Error("Missing spells data");
+          }
+        })
+        .catch((e) => {
+          let message;
+          if (e.response.data.reason != null) {
+            message = e.response.data.reason;
+          } else {
+            message = "Problem fetching spells";
+          }
+          this.$notify({
+            message: message,
+            type: "error",
+            top: false,
+            bottom: true,
+            left: false,
+            right: true,
+            showClose: true,
+            closeDelay: 0,
+          });
+          this.specialsLoading = false;
+        });
+    },
+    fetchSpecials() {
+      this.specialsLoading = true;
+      axios
+        .get("api/specials/index/" + this.character.id)
+        .then((res) => {
+          if (res.data.specials != null) {
+            this.specials = res.data.specials;
+            this.specialsLoading = false;
+          } else {
+            throw new Error("Missing specialist skills data");
+          }
+        })
+        .catch((e) => {
+          let message;
+          if (e.response.data.reason != null) {
+            message = e.response.data.reason;
+          } else {
+            message = "Problem fetching specialist skills";
+          }
+          this.$notify({
+            message: message,
+            type: "error",
+            top: false,
+            bottom: true,
+            left: false,
+            right: true,
+            showClose: true,
+            closeDelay: 0,
+          });
+          this.specialsLoading = false;
+        });
+    },
     submit() {
       if (!this.isLoading) {
         this.isLoading = true;
@@ -236,6 +335,7 @@ export default {
             skill: this.selectedSkill,
             hp: this.hpIncrease,
             stat: this.statIncrease,
+            special: this.selectedSpecial
           })
           .then((res) => {
             location.reload();

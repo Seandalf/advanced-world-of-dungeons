@@ -3,31 +3,31 @@
 namespace App\Http\Controllers\API;
 
 use Exception;
-use App\Models\Ability;
+use App\Models\Spell;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
-class AbilityApiController extends Controller
+class SpellApiController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
         try {
             return response()->json([
                 'success' => true,
-                'abilities'  => Ability::whereNull('class_id')->toArray()
+                'spells'  => Spell::whereClassId($id)->get()->toArray()
             ])->setStatusCode(200);
         } catch (Exception $e) {
-            Log::error('Could not fetch abiities', ['error' => $e->getMessage()]);
+            Log::error('Could not fetch spells', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'reason'  => $e->getMessage()
-            ])->setStatusCode(500);
+            ])->setStatusCode(200);
         }
     }
 

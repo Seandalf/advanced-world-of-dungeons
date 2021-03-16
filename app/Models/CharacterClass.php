@@ -13,4 +13,19 @@ class CharacterClass extends Model
     {
         return $this->hasMany(Character::class);
     }
+
+    public function spells()
+    {
+        return $this->hasMany(Spell::class, 'class_id');
+    }
+
+    public function specials()
+    {
+        return $this->hasMany(Special::class, 'class_id');
+    }
+
+    public function hasSpells()
+    {
+        return $this->has_spells;
+    }
 }

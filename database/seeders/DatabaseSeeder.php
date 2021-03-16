@@ -13,6 +13,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            UserSeeder::class,
+            CharacterClassSeeder::class,
+            CharacterSeeder::class,
+            AbilitySeeder::class,
+            ArmourSeeder::class,
+            BackgroundSeeder::class,
+            EquipmentSeeder::class,
+            RandomGeneratorSeeder::class,
+            SkillSeeder::class,
+            SpellSeeder::class,
+            WeaponSeeder::class
+        ]);
     }
 }
