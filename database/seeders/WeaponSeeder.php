@@ -14,13 +14,13 @@ class WeaponSeeder extends Seeder
      */
     public function run()
     {
-        Weapon::insert([
-            [
-                'name'        => '',
-                'description' => '',
-                'damage'      => '',
-                'cost'        => ''
-            ]
-        ]);
+        // Weapon::insert([
+        //     [
+        //         'name'        => '',
+        //         'description' => '',
+        //         'damage'      => '',
+        //         'cost'        => ''
+        //     ]
+        // ]);
     }
 }

@@ -14,13 +14,13 @@ class EquipmentSeeder extends Seeder
      */
     public function run()
     {
-        Equipment::insert([
-            [
-                'name'        => '',
-                'description' => '',
-                'cost'        => '',
-                'uses'        => ''
-            ]
-        ]);
+        // Equipment::insert([
+        //     [
+        //         'name'        => '',
+        //         'description' => '',
+        //         'cost'        => '',
+        //         'uses'        => ''
+        //     ]
+        // ]);
     }
 }

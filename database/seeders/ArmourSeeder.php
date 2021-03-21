@@ -14,13 +14,13 @@ class ArmourSeeder extends Seeder
      */
     public function run()
     {
-        Armour::insert([
-            [
-                'name' => '',
-                'effect' => '',
-                'armour_value' => '',
-                'cost' => ''
-            ]
-        ]);
+        // Armour::insert([
+        //     [
+        //         'name' => '',
+        //         'effect' => '',
+        //         'armour_value' => '',
+        //         'cost' => ''
+        //     ]
+        // ]);
     }
 }

@@ -31,8 +31,8 @@ class AbilitySeeder extends Seeder
         ]);
         Ability::insert([
             [
-                'name'     => 'You can imbue any weapon with a portion of your own life force. Reduce your maximum HP (restored when rite fades) by your character level to allow your weapon to deal an extra 1d4 madical damage, or you can apply one of the following forms of magical damage: fire, cold, lightning, acid, thunder, psychic, or necrotic.',
-                'effect'   => 'You begin with three nature-based spells',
+                'name'     => 'Crimson Rite',
+                'effect'   => 'You can imbue any weapon with a portion of your own life force. Reduce your maximum HP (restored when rite fades) by your character level to allow your weapon to deal an extra 1d4 madical damage, or you can apply one of the following forms of magical damage: fire, cold, lightning, acid, thunder, psychic, or necrotic.',
                 'class_id' => CharacterClass::whereName('The Warpling')->pluck('id')->first()
             ]
         ]);

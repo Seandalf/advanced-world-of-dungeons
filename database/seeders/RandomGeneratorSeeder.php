@@ -14,11 +14,11 @@ class RandomGeneratorSeeder extends Seeder
      */
     public function run()
     {
-        RandomGenerator::insert([
-            [
-                'type'  => '',
-                'value' => ''
-            ]
-        ]);
+        // RandomGenerator::insert([
+        //     [
+        //         'type'  => '',
+        //         'value' => ''
+        //     ]
+        // ]);
     }
 }
