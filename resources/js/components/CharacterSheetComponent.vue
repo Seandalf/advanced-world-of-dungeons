@@ -506,7 +506,7 @@ export default {
       }
     },
   },
-  mounted() {
+  created() {
     this.fetchCharacter();
   },
   methods: {

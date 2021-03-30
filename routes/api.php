@@ -30,8 +30,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/characters/show/{id}', [CharacterApiController::class, 'show']);
 Route::patch('/characters/update', [CharacterApiController::class, 'update']);
 
-Route::get('/skills/index', [SkillApiController::class, 'index']);
-Route::get('/abilities/index', [AbilityApiController::class, 'index']);
+Route::get('/skills/index/{id}', [SkillApiController::class, 'index']);
+Route::get('/abilities/index/{id}', [AbilityApiController::class, 'index']);
 Route::get('/armours/index', [ArmourApiController::class, 'index']);
 Route::get('/items/index', [EquipmentApiController::class, 'index']);
 Route::get('/weapons/index', [WeaponApiController::class, 'index']);

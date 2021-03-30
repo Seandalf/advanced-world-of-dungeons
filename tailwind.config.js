@@ -22,14 +22,18 @@ module.exports = {
             screens: {
                 'xs': '500px',
                 'mdl': '896px'
+            },
+            fontSize: {
+                'ds': '.8175rem'
             }
-        },
+        }
     },
 
     variants: {
         extend: {
             opacity: ['disabled'],
-            pointerEvents: ['disabled']
+            pointerEvents: ['disabled'],
+            transitionProperty: ['hover', 'focus']
         },
     },
 

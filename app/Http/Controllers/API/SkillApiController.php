@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use Exception;
+use App\Models\Skill;
+use App\Models\Character;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\Skill;
 
 class SkillApiController extends Controller
 {
@@ -15,12 +16,17 @@ class SkillApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
         try {
+            $character = Character::find($id);
+            $acquired = [];
+            foreach($character->skills as $skill) {
+                $acquired[] = $skill->id;
+            }
             return response()->json([
                 'success' => true,
-                'skills'  => Skill::all()->toArray()
+                'skills'  => Skill::whereNotIn('id', $acquired)->get()->toArray()
             ])->setStatusCode(200);
         } catch (Exception $e) {
             Log::error('Could not fetch skills', ['error' => $e->getMessage()]);

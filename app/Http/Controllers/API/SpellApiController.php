@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Exception;
 use App\Models\Spell;
+use App\Models\Character;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -18,9 +19,14 @@ class SpellApiController extends Controller
     public function index($id)
     {
         try {
+            $character = Character::find($id);
+            $acquired = [];
+            foreach($character->spells as $spell) {
+                $acquired[] = $spell->id;
+            }
             return response()->json([
                 'success' => true,
-                'spells'  => Spell::whereClassId($id)->get()->toArray()
+                'spells'  => Spell::whereClassId($character->class_id)->whereNotIn('id', $acquired)->get()->toArray()
             ])->setStatusCode(200);
         } catch (Exception $e) {
             Log::error('Could not fetch spells', ['error' => $e->getMessage()]);

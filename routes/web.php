@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\ResetPasswordController;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,5 +23,9 @@ Route::post('/character/create', [CharacterController::class, 'create'])->middle
 
 Route::get('/reset', [ResetPasswordController::class, 'index'])->middleware(['auth'])->name('pass.reset');
 Route::post('/reset', [ResetPasswordController::class, 'resetPassword'])->middleware(['auth'])->name('pass.reset');
+
+Route::get('/cowboy', function() {
+    return Hash::make('Kappa9gamma0');
+});
 
 require __DIR__ . '/auth.php';

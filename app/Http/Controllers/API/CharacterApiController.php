@@ -266,18 +266,24 @@ class CharacterApiController extends Controller
                             $item_quantity = $i['pivot']['quantity'];
                             if ($item_record['uses'] !== null) {
                                 $item_uses = $i['pivot']['uses'];
+                            } else {
+                                $item_uses = null;
                             }
                         }
                     }
                     $arr['quantity'] = $item_quantity + 1;
-                    if ($item_record['uses'] !== null) {
+                    if ($item_record['uses'] !== null && $item_record['uses'] > 0) {
                         $arr['uses'] = $item_uses + $item_record['uses'];
+                    } else {
+                        $arr['uses'] = null;
                     }
                     $character->equipment()->updateExistingPivot($item, $arr);
                 } else {
                     $arr = ['quantity' => 1, 'carried' => 1, 'equipped' => 0];
                     if ($item_record['uses'] !== null) {
                         $arr['uses'] = $item_record['uses'];
+                    } else {
+                        $arr['uses'] = null;
                     }
                     $character->equipment()->attach($item, $arr);
                 }
@@ -297,6 +303,9 @@ class CharacterApiController extends Controller
                     $character->weapons()->attach($a, ['quantity' => 1, 'carried' => 1, 'equipped' => 0]);
                 }
             }
+
+            $character->coin = $character->coin - $request->total;
+            $character->save();
 
             return response()->json([
                 'success' => true

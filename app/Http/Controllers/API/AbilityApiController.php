@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API;
 
 use Exception;
 use App\Models\Ability;
+use App\Models\Character;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AbilityApiController extends Controller
 {
@@ -15,12 +17,17 @@ class AbilityApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
         try {
+            $character = Character::find($id);
+            $acquired = [];
+            foreach($character->abilities as $ability) {
+                $acquired[] = $ability->id;
+            }
             return response()->json([
                 'success' => true,
-                'abilities'  => Ability::whereNull('class_id')->toArray()
+                'abilities'  => Ability::whereNull('class_id')->whereNotIn('id', $acquired)->get()->toArray()
             ])->setStatusCode(200);
         } catch (Exception $e) {
             Log::error('Could not fetch abiities', ['error' => $e->getMessage()]);
