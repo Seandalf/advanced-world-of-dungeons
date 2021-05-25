@@ -27,7 +27,13 @@ class AbilityApiController extends Controller
             }
             return response()->json([
                 'success' => true,
-                'abilities'  => Ability::whereNull('class_id')->whereNotIn('id', $acquired)->get()->toArray()
+                'abilities'  => Ability::where(function ($query) use ($character) {
+                                            $query->whereClassId($character->class_id)
+                                                  ->orWhereNull('class_id');
+                                        })
+                                        ->whereNotIn('id', $acquired)
+                                        ->get()
+                                        ->toArray()
             ])->setStatusCode(200);
         } catch (Exception $e) {
             Log::error('Could not fetch abiities', ['error' => $e->getMessage()]);

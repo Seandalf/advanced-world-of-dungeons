@@ -231,7 +231,7 @@ export default {
     fetchAbilities() {
       this.abilitiesLoading = true;
       axios
-        .get("api/abilities/index")
+        .get("api/abilities/index/" + this.current.id)
         .then((res) => {
           if (res.data.abilities != null) {
             this.abilities = res.data.abilities;
